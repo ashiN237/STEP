@@ -6,12 +6,12 @@ import argparse
 def find_highest_score_anagram(word: str, dictionary: List[str]) -> str:
   """Explore an highest scoring anagram
 
-  Args:
-      word (str): any input alphabetic string 
-      dictionary (List[str]): the list of dictionaries given
+    Args:
+        word (str): any input alphabetic string 
+        dictionary (List[str]): the list of dictionaries given
 
-  Returns:
-      str: an anagram with the highest score
+    Returns:
+        str: an anagram with the highest score
   """
   word_counter = Counter(word)
   max_score = 0
