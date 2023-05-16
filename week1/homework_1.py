@@ -1,5 +1,6 @@
 from typing import List
 import sys
+import argparse
 
 
 def find_all_anagram(random_word: str, dictionary: List[str]) -> List[str]:
@@ -82,23 +83,24 @@ def list_to_text(name: str, words: List[str]) -> None:
     f.write(new_words)
 
 
-def main(input_file: str, output_file: str, random_word: str) -> None:
-  dictionary = text_to_list(input_file)
-  anagram = find_all_anagram(random_word, dictionary)
+def main():
+  parser = argparse.ArgumentParser(description="Find anagrams in a text file using a dictionary file")
+  parser.add_argument('dictionary_file', type=str, help='Path to the dictionary file')
+  parser.add_argument('output_file', type=str, help='Path to the output file')
+  parser.add_argument('random_word', type=str, help='Path to the random word')
+  args = parser.parse_args()
+  
+  
+  dictionary = text_to_list(args.dictionary_file)
+  anagram = find_all_anagram(args.random_word, dictionary)
 
   if not anagram:
     print(None)
   else:
     print(anagram)
 
-  list_to_text(output_file, anagram)
+  list_to_text(args.output_file, anagram)
 
 
 if __name__ == "__main__":
-  if len(sys.argv) != 4:
-    print("Usage: python3 homework_1.py input_file output_file rondom_word")
-  else:
-    input_file = sys.argv[1]
-    output_file = sys.argv[2]
-    random_word = sys.argv[3]
-    main(input_file, output_file, random_word)
+  main()
