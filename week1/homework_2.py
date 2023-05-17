@@ -1,7 +1,6 @@
 from typing import List
 from collections import Counter
 import argparse
-import time
 
 
 SCORES = [1, 3, 2, 2, 1, 3, 3, 1, 1, 4, 4, 2, 2, 1, 1, 3, 4, 1, 1, 1, 2, 3, 3, 4, 3, 4]
@@ -70,8 +69,6 @@ def main():
   parser.add_argument('output_file', type=str, help='Path to the output file')
   args = parser.parse_args()
 
-  start_time = time.time()
-
   dictionary = text_to_list(args.dictionary_file)
   input_words = text_to_list(args.input_file)
   anagrams = []
@@ -81,10 +78,6 @@ def main():
     anagrams.append(anagram.word)
 
   list_to_text(args.output_file, anagrams)
-
-  end_time = time.time()
-  execution_time = end_time - start_time
-  print("Execution time:", execution_time, "seconds")
 
 
 if __name__ == '__main__':
