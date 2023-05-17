@@ -23,16 +23,11 @@ def find_highest_score_anagram(word: Word, dictionary: List[Word]) -> Word:
     Returns:
         Word: an anagram with the highest score
   """
-  max_score = 0
-  max_word = None
-
   for dict_word in dictionary:
-    if dict_word.score > max_score:
-      if all(dict_word.counter[key] <= word.counter[key] for key in dict_word.counter):
-        max_score = dict_word.score
-        max_word = dict_word
+    if all(dict_word.counter[key] <= word.counter[key] for key in dict_word.counter):
+      return dict_word
 
-  return max_word
+  return None
 
 
 def text_to_list(text: str) -> List[Word]:
@@ -70,6 +65,7 @@ def main():
   args = parser.parse_args()
 
   dictionary = text_to_list(args.dictionary_file)
+  dictionary.sort(key=lambda x: x.score, reverse=True)
   input_words = text_to_list(args.input_file)
   anagrams = []
 
