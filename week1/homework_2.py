@@ -17,11 +17,11 @@ def find_highest_score_anagram(word: Word, dictionary: List[Word]) -> Word:
   """Explore an highest scoring anagram
 
     Args:
-        word (str): any input alphabetic string 
-        dictionary (List[str]): the list of dictionaries given
+        word (Word): any input alphabetic string 
+        dictionary (List[Word]): the list of dictionaries given
 
     Returns:
-        str: an anagram with the highest score
+        Word: an anagram with the highest score
   """
   max_score = 0
   max_word = None
@@ -42,7 +42,7 @@ def text_to_list(text: str) -> List[Word]:
         text (str): the name of the input text file
 
     Returns:
-        List[str]: the list of words in the input text file
+        List[Word]: the list of words in the input text file
   """
   with open(text, 'r') as f:
     new_list = f.readlines()
