@@ -1,5 +1,4 @@
 from typing import List
-import sys
 import argparse
 
 
@@ -89,13 +88,12 @@ def main():
   parser.add_argument('output_file', type=str, help='Path to the output file')
   parser.add_argument('random_word', type=str, help='Path to the random word')
   args = parser.parse_args()
-  
-  
+
   dictionary = text_to_list(args.dictionary_file)
   anagram = find_all_anagram(args.random_word, dictionary)
 
   if not anagram:
-    print(None)
+    print("There is no anagram")
   else:
     print(anagram)
 
