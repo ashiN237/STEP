@@ -1,9 +1,20 @@
 from typing import List
 from collections import Counter
 import argparse
+import time
 
 
-def find_highest_score_anagram(word: str, dictionary: List[str]) -> str:
+SCORES = [1, 3, 2, 2, 1, 3, 3, 1, 1, 4, 4, 2, 2, 1, 1, 3, 4, 1, 1, 1, 2, 3, 3, 4, 3, 4]
+
+
+class Word:
+  def __init__(self, word: str):
+    self.word = word
+    self.score = sum(SCORES[ord(c) - ord('a')] for c in word)
+    self.counter = Counter(word)
+
+
+def find_highest_score_anagram(word: Word, dictionary: List[Word]) -> Word:
   """Explore an highest scoring anagram
 
     Args:
@@ -13,21 +24,19 @@ def find_highest_score_anagram(word: str, dictionary: List[str]) -> str:
     Returns:
         str: an anagram with the highest score
   """
-  word_counter = Counter(word)
   max_score = 0
   max_word = None
-  SCORES = [1, 3, 2, 2, 1, 3, 3, 1, 1, 4, 4, 2, 2, 1, 1, 3, 4, 1, 1, 1, 2, 3, 3, 4, 3, 4]
-  for i in range(len(dictionary)):
-    dict_counter = Counter(dictionary[i])
-    if all(dict_counter[key] <= word_counter[key] for key in dict_counter):
-      score = sum(SCORES[ord(c) - ord('a')] for c in dictionary[i])
-      if score > max_score:
-        max_score = score
-        max_word = dictionary[i]
+
+  for dict_word in dictionary:
+    if dict_word.score > max_score:
+      if all(dict_word.counter[key] <= word.counter[key] for key in dict_word.counter):
+        max_score = dict_word.score
+        max_word = dict_word
+
   return max_word
 
 
-def text_to_list(text: str) -> List[str]:
+def text_to_list(text: str) -> List[Word]:
   """change text file to list
 
     Args:
@@ -38,7 +47,7 @@ def text_to_list(text: str) -> List[str]:
   """
   with open(text, 'r') as f:
     new_list = f.readlines()
-  new_list = [word.strip() for word in new_list]
+  new_list = [Word(word.strip()) for word in new_list]
   return new_list
 
 
@@ -61,15 +70,21 @@ def main():
   parser.add_argument('output_file', type=str, help='Path to the output file')
   args = parser.parse_args()
 
+  start_time = time.time()
+
   dictionary = text_to_list(args.dictionary_file)
   input_words = text_to_list(args.input_file)
   anagrams = []
 
-  for i in range(len(input_words)):
-    anagram = find_highest_score_anagram(input_words[i], dictionary)
-    anagrams.append(anagram)
+  for input_word in input_words:
+    anagram = find_highest_score_anagram(input_word, dictionary)
+    anagrams.append(anagram.word)
 
   list_to_text(args.output_file, anagrams)
+
+  end_time = time.time()
+  execution_time = end_time - start_time
+  print("Execution time:", execution_time, "seconds")
 
 
 if __name__ == '__main__':
