@@ -2,27 +2,37 @@ from typing import List
 from collections import Counter
 import argparse
 
+## How to use
+#
+# $ python3 homework_2.py dictionary.txt input.txt output.txt
 
 SCORES = [1, 3, 2, 2, 1, 3, 3, 1, 1, 4, 4, 2, 2, 1, 1, 3, 4, 1, 1, 1, 2, 3, 3, 4, 3, 4]
 
 
 class Word:
-  def __init__(self, word: str):
+  """Represents a word with its score and character count."""
+
+  def __init__(self, word: str) -> None:
+    """Initialize a Word object.
+        
+      Args:
+          word (str): The input word.
+    """
     self.word = word
     self.score = sum(SCORES[ord(c) - ord('a')] for c in word)
     self.counter = Counter(word)
 
 
 def find_highest_score_anagram(word: Word, dictionary: List[Word]) -> Word:
-  """Explore an highest scoring anagram
-
+  """Find the anagram with the highest score from the given dictionary.
+    
     Args:
-        word (Word): any input alphabetic string 
-        dictionary (List[Word]): the list of dictionaries given
-
+        word (Word): The input word.
+        dictionary (List[Word]): The list of Word objects representing the dictionary.
+        
     Returns:
-        Word: an anagram with the highest score
-  """
+        Word: The anagram with the highest score.
+    """
   for dict_word in dictionary:
     if all(dict_word.counter[key] <= word.counter[key] for key in dict_word.counter):
       return dict_word
@@ -31,13 +41,13 @@ def find_highest_score_anagram(word: Word, dictionary: List[Word]) -> Word:
 
 
 def text_to_list(text: str) -> List[Word]:
-  """change text file to list
-
+  """Convert a text file to a list of Word objects.
+    
     Args:
-        text (str): the name of the input text file
-
+        text (str): The name of the input text file.
+        
     Returns:
-        List[Word]: the list of words in the input text file
+        List[Word]: The list of words in the input text file.
   """
   with open(text, 'r') as f:
     new_list = f.readlines()
@@ -46,11 +56,11 @@ def text_to_list(text: str) -> List[Word]:
 
 
 def list_to_text(name: str, words: List[str]) -> None:
-  """change list to text file
-
+  """Convert a list of words to a text file.
+    
     Args:
-        name (str): the name of the output text file
-        words (List[str]): the list of words to write in the output text file
+        name (str): The name of the output text file.
+        words (List[str]): The list of words to write in the output text file.
   """
   new_words = "\n".join(str(word) for word in words)
   with open(name, 'w') as f:
@@ -58,6 +68,7 @@ def list_to_text(name: str, words: List[str]) -> None:
 
 
 def main():
+  """Main function to find anagrams in a text file using a dictionary file."""
   parser = argparse.ArgumentParser(description="Find anagrams in a text file using a dictionary file")
   parser.add_argument('dictionary_file', type=str, help='Path to the dictionary file')
   parser.add_argument('input_file', type=str, help='Path to the input file')
