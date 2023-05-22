@@ -69,7 +69,7 @@ pythonのライブラリを使用せずにhash tableの実装を行う
   - キャッシュに含まれる要素がアクセスされたら、まず元々含まれている要素をhash tableのdeleteと同じアルゴリズムで削除し、新しい要素として再度追加する
 
 
-<h3 style="text-align:center;">表1 キャッシュの例</h3>
+<h3 align="center">表1 キャッシュの例</h3>
 <p align="center">
   <table>
     <thead>
@@ -106,8 +106,8 @@ pythonのライブラリを使用せずにhash tableの実装を行う
 
 <p align="center">
   <img src="./homework_3/img/deque.png">  
-  <h3 style="text-align:center;">図2 キャッシュ管理の概略図</h3>
 </p>
+  <h3 align="center">図2 キャッシュ管理の概略図</h3>
 
 
 ## <u>宿題4:キャッシュの実装</u>
