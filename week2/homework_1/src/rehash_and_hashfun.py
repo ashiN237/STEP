@@ -13,28 +13,16 @@ import random, sys, time
 #
 # |key|: string
 # Return value: a hash value
-
-# def calculate_hash(key: str) -> int:
-#     assert type(key) == str
-#     HASH = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101]
-#     hash = 1
-#     for i in key:
-#         if ord(i) - ord('a') >= 0 and ord(i) - ord('a') < len(HASH):
-#             hash *= HASH[ord(i) - ord('a')]
-#     return hash
-
 def calculate_hash(key: str) -> int:
     assert type(key) == str
-    p = 31  # 素数 p を選ぶ
-    m = 10**9 + 9  # 素数 m を選ぶ
+    p = 31
+    m = 10**9 + 9 
     hash_value = 0
     p_pow = 1
     for i in key:
         hash_value = (hash_value + (ord(i) - ord('a') + 1) * p_pow) % m
         p_pow = (p_pow * p) % m
     return hash_value
-
-
 
 
 # An item object that represents one key - value pair in the hash table.
@@ -89,6 +77,7 @@ class HashTable:
         new_item = Item(key, value, self.buckets[bucket_index])
         self.buckets[bucket_index] = new_item
         self.item_count += 1
+        self.rehash()
         return True
 
     # Get an item from the hash table.
@@ -126,6 +115,7 @@ class HashTable:
                 else:
                     self.buckets[bucket_index] = item.next
                 self.item_count -= 1
+                self.rehash()
                 return True
                 
             prev_item = item
@@ -143,12 +133,19 @@ class HashTable:
     #
     # Note: Don't change this function.
     def check_size(self):
-        if self.item_count >= self.bucket_size * self.load_factor:
-            self.rehash()
+        assert (self.bucket_size < 100 or
+                self.item_count >= self.bucket_size * 0.3)
 
-    # Rehash the hash table by resizing the bucket size.
+    # Rehash the hash table if the ratio exceeds a threshold.
     def rehash(self):
-        new_bucket_size = self.bucket_size * 2
+        ratio = self.item_count / self.bucket_size
+        if ratio > 0.7:
+            new_bucket_size = self.bucket_size * 2
+        elif ratio < 0.3:
+            new_bucket_size = max(self.bucket_size // 2, 1)
+        else:
+            return
+
         new_buckets = [None] * new_bucket_size
 
         for i in range(self.bucket_size):
@@ -163,22 +160,6 @@ class HashTable:
         self.buckets = new_buckets
         self.bucket_size = new_bucket_size
 
-    # Shrink the hash table by resizing the bucket size.
-    def shrink(self):
-        new_bucket_size = max(self.bucket_size // 2, 1)
-        new_buckets = [None] * new_bucket_size
-
-        for i in range(self.bucket_size):
-            item = self.buckets[i]
-            while item:
-                next_item = item.next
-                new_bucket_index = calculate_hash(item.key) % new_bucket_size
-                item.next = new_buckets[new_bucket_index]
-                new_buckets[new_bucket_index] = item
-                item = next_item
-
-        self.buckets = new_buckets
-        self.bucket_size = new_bucket_size
 
 # Test the functional behavior of the hash table.
 def functional_test():
