@@ -1,4 +1,5 @@
 import random, sys, time, math
+from typing import Tuple
 
 ###########################################################################
 #                                                                         #
@@ -81,7 +82,7 @@ class HashTable:
     # |key|: The key.
     # Return value: If the item is found, (the value of the item, True) is
     #               returned. Otherwise, (None, False) is returned.
-    def get(self, key: str):
+    def get(self, key: str) -> Tuple[None, bool]:
         assert type(key) == str
         self.check_size() # Note: Don't remove this code.
         bucket_index = calculate_hash(key) % self.bucket_size
@@ -119,7 +120,7 @@ class HashTable:
         return False
 
     # Return the total number of items in the hash table.
-    def size(self):
+    def size(self) -> int:
         return self.item_count
 
     # Check that the hash table has a "reasonable" bucket size.
@@ -127,12 +128,12 @@ class HashTable:
     # the buckets are 30% or more used.
     #
     # Note: Don't change this function.
-    def check_size(self):
+    def check_size(self) -> None:
         assert (self.bucket_size < 100 or
                 self.item_count >= self.bucket_size * 0.3)
 
     # Rehash the hash table if the ratio exceeds a threshold.
-    def rehash(self):
+    def rehash(self) -> None:
         ratio = self.item_count / self.bucket_size
         if ratio > 0.7:
             new_bucket_size = self.bucket_size * 2
