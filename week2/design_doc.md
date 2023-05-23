@@ -105,7 +105,7 @@ pythonのライブラリを使用せずにhash tableの実装を行う
 
 
 <p align="center">
-  <img src="./homework_3/img/deque.png" style="width: 600px; height: auto;">  
+  <img src="./homework_3/img/homework_3.png" style="width: 600px; height: auto;">  
 </p>
   <h3 align="center">図2 キャッシュ管理の概略図</h3>
 
