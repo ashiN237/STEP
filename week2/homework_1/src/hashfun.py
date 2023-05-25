@@ -14,14 +14,15 @@ from typing import Tuple
 #
 # |key|: string
 # Return value: a hash value
+# It uses polynomial hash function
 def calculate_hash(key: str) -> int:
     assert type(key) == str
-    p = 31
-    m = 10**9 + 9
+    p = 31 # Prime number for hashing
+    m = 10**9 + 9 # Modulus for hashing
     hash_value = 0
-    p_pow = 1
+    p_pow = 1 # Precompute powers of p
     for i in key:
-        hash_value = (hash_value + (ord(i) - ord('a') + 1) * p_pow) % m
+        hash_value = (hash_value + (ord(i) - ord('a') + 1) * p_pow) % m # Calculate hash value using polynomial rolling hash function
         p_pow = (p_pow * p) % m
     return hash_value
 
