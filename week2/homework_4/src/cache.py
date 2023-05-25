@@ -32,9 +32,9 @@ class Cache:
     # Return the URLs stored in the cache. The URLs are ordered in the order
     # in which the URLs are mostly recently accessed.
     def get_pages(self) -> List[str]:
-        return self.pages[::-1]
+        return self.pages[::-1] 
 
-    
+
 # Hash function.
 #
 # |key|: string
