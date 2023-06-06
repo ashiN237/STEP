@@ -1,6 +1,6 @@
 import sys
 import collections
-from typing import List
+from typing import Dict
 
 class Wikipedia:
 
@@ -77,8 +77,6 @@ class Wikipedia:
     # |goal|: The title of the goal page.
     def find_shortest_path(self, start: str, goal: str) -> None:
         # ページタイトルからページIDを取得
-        start_page_id = None
-        goal_page_id = None
         for page_id, title in self.titles.items():
             if title == start:
                 start_page_id = page_id
@@ -97,7 +95,7 @@ class Wikipedia:
 
 
     # BFSをdequeを用いて実装
-    def bfs(self, start: str, goal: str) -> collections.deque:
+    def bfs(self, start: int, goal: int) -> collections.deque:
         visited = set()  # 訪れたノードを記録する集合
         queue = collections.deque([[start]])  # キューを用いて探索するためのデータ構造を準備
 
@@ -122,9 +120,8 @@ class Wikipedia:
         return None
 
 
-
     # Calculate the page ranks and print the most popular pages.
-    def find_most_popular_pages(self):
+    def find_most_popular_pages(self) -> None:
         page_rank = self.calculate_page_ranks()
 
         # ページランクの収束の確認
@@ -151,31 +148,29 @@ class Wikipedia:
 
 
     # Calculate the page ranks
-    def calculate_page_ranks(self):
-        # ページごとのリンク数を初期化
+    def calculate_page_ranks(self) -> Dict[int, float]:
+        # ページごとのリンク数とページランクを初期化
         link_count = {page_id: 0 for page_id in self.titles.keys()}
+        page_rank = {page_id: 1.0 for page_id in self.titles.keys()}
 
         # ページごとのリンク数をカウント
         for page_id in self.links.keys():
             link_count[page_id] += len(self.links[page_id])
 
-        # ページランクを初期化
-        page_rank = {page_id: 1.0 for page_id in self.titles.keys()}
-
         # ページランクを計算
         damping_factor = 0.85
+        random_surfer_probability = 0.15
         iterations = 10
-        for _ in range(iterations):
+        for i in range(iterations):
             new_page_rank = {page_id: 0.0 for page_id in self.titles.keys()}
             for page_id in self.titles.keys():
                 if page_id in self.links and len(self.links[page_id]) > 0:
                     for link in self.links[page_id]:
                         # 隣接ノードのページランクを加算
-                        new_page_rank[link] += damping_factor * (page_rank[page_id] / link_count[page_id])
-            random_surfer_probability = 0.15
-            random_surfer_page_rank = random_surfer_probability / len(self.titles)
+                        new_page_rank[link] += damping_factor * page_rank[page_id] / link_count[page_id]
+            random_surfer_page_rank = random_surfer_probability * page_rank[page_id] / len(self.titles)
             for page_id in self.titles.keys():
-                new_page_rank[page_id] += random_surfer_page_rank
+                new_page_rank[link] += random_surfer_page_rank
 
             # 新しいページランクを代入
             page_rank = new_page_rank
@@ -197,7 +192,7 @@ if __name__ == "__main__":
         exit(1)
 
     wikipedia = Wikipedia(sys.argv[1], sys.argv[2])
-    wikipedia.find_longest_titles()
-    wikipedia.find_most_linked_pages()
-    wikipedia.find_shortest_path("渋谷", "パレートの法則")
+    # wikipedia.find_longest_titles()
+    # wikipedia.find_most_linked_pages()
+    # wikipedia.find_shortest_path("渋谷", "パレートの法則")
     wikipedia.find_most_popular_pages()
