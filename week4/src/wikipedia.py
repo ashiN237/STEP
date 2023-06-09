@@ -122,13 +122,14 @@ class Wikipedia:
 
     # Calculate the page ranks and print the most popular pages.
     def find_most_popular_pages(self) -> None:
-        page_rank = self.calculate_page_ranks()
+        page_rank = {page_id: 1.0 for page_id in self.titles.keys()}
+        page_rank = self.calculate_page_ranks(page_rank)
 
         # ページランクの収束の確認
         threshold = 0.0001  # 収束判定の閾値
         max_iterations = 100  # 最大繰り返し回数
         for i in range(max_iterations):
-            new_page_rank = self.calculate_page_ranks()
+            new_page_rank = self.calculate_page_ranks(page_rank)
             diff = sum(abs(new_page_rank[page_id] - page_rank[page_id]) for page_id in self.titles.keys())
             if diff < threshold:
                 page_rank = new_page_rank
@@ -148,34 +149,22 @@ class Wikipedia:
 
 
     # Calculate the page ranks
-    def calculate_page_ranks(self) -> Dict[int, float]:
-        # ページごとのリンク数とページランクを初期化
-        link_count = {page_id: 0 for page_id in self.titles.keys()}
-        page_rank = {page_id: 1.0 for page_id in self.titles.keys()}
-
-        # ページごとのリンク数をカウント
-        for page_id in self.links.keys():
-            link_count[page_id] += len(self.links[page_id])
-
-        # ページランクを計算
+    def calculate_page_ranks(self, page_rank) -> Dict[int, float]:
         damping_factor = 0.85
         random_surfer_probability = 0.15
-        iterations = 10
-        for i in range(iterations):
-            new_page_rank = {page_id: 0.0 for page_id in self.titles.keys()}
-            for page_id in self.titles.keys():
-                if page_id in self.links and len(self.links[page_id]) > 0:
-                    for link in self.links[page_id]:
-                        # 隣接ノードのページランクを加算
-                        new_page_rank[link] += damping_factor * page_rank[page_id] / link_count[page_id]
-            random_surfer_page_rank = random_surfer_probability * page_rank[page_id] / len(self.titles)
-            for page_id in self.titles.keys():
-                new_page_rank[link] += random_surfer_page_rank
 
-            # 新しいページランクを代入
-            page_rank = new_page_rank
-
-        return page_rank
+        new_page_rank = {page_id: 0.0 for page_id in self.titles.keys()}
+        for page_id, links in self.links.items():
+            if links:
+                for link in links:
+                    new_page_rank[link] += damping_factor * page_rank[page_id] / len(links)
+                random_surfer_page_rank = random_surfer_probability * page_rank[page_id] / len(self.titles)
+                for page_id_2 in self.titles.keys():
+                    new_page_rank[page_id_2] += random_surfer_page_rank         
+            else:
+                for page_id_2 in self.titles.keys():
+                    new_page_rank[page_id_2] += page_rank[page_id] / len(self.titles)
+        return new_page_rank
 
 
     # Do something more interesting!!
