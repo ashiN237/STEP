@@ -1,3 +1,4 @@
+import csv
 import sys
 import math
 import random
@@ -37,9 +38,24 @@ def improve_tour(cities: List[List[float]], tour: List[int]) -> List[int]:
                     improved = True
     return tour
 
+
+def print_tour_indices(tour: List[int], output_filename: str):
+    with open(output_filename, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['index'])
+        for city_index in tour:
+            writer.writerow([city_index])
+
 if __name__ == '__main__':
-    assert len(sys.argv) > 1
-    cities = read_input(sys.argv[1])  # 入力ファイルから都市の座標を読み込む
-    tour = generate_initial_tour(cities)  # 初期巡回路を生成
-    improved_tour = improve_tour(cities, tour)  # 巡回路を改善
-    print_tour(improved_tour)  # 改善された巡回路を出力
+    for i in range(8):
+        input_filename = f'input_{i}.csv'
+        output_filename = f'output_{i}.csv'
+        
+        cities = read_input(input_filename)  # 入力ファイルから都市の座標を読み込む
+        tour = generate_initial_tour(cities)  # 初期巡回路を生成
+        improved_tour = improve_tour(cities, tour)  # 巡回路を改善
+        
+        # 改善された巡回路のインデックスをファイルに書き込み
+        print_tour_indices(improved_tour, output_filename)
+
+        print(f'Output written to {output_filename}')
