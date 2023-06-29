@@ -70,13 +70,18 @@ void my_initialize() {
   my_heap.dummy.next = NULL;
 }
 
+
+// my_malloc() is called every time an object is allocated.
+// |size| is guaranteed to be a multiple of 8 bytes and meets 8 <= |size| <=
+// 4000. You are not allowed to use any library functions other than
+// mmap_from_system() / munmap_to_system().
 void *my_malloc(size_t size) {
   my_metadata_t *best_fit_metadata = NULL;
   my_metadata_t *best_fit_prev = NULL;
   my_metadata_t *metadata = my_heap.free_head;
   my_metadata_t *prev = NULL;
 
-  // 最適なスロットを見つける
+  // 最適なスロットを見つける(best-fit)
   while (metadata) {
     if (metadata->size >= size && (!best_fit_metadata || metadata->size < best_fit_metadata->size)) {
       best_fit_metadata = metadata;
@@ -87,7 +92,14 @@ void *my_malloc(size_t size) {
   }
 
   if (!best_fit_metadata) {
-    // 十分なサイズの空きスロットが見つからない場合、新しいメモリ領域を要求
+    // There was no free slot available. We need to request a new memory region
+    // from the system by calling mmap_from_system().
+    //
+    //     | metadata | free slot |
+    //     ^
+    //     metadata
+    //     <---------------------->
+    //            buffer_size
     size_t buffer_size = 4096;
     my_metadata_t *metadata = (my_metadata_t *)mmap_from_system(buffer_size);
     metadata->size = buffer_size - sizeof(my_metadata_t);
@@ -96,12 +108,28 @@ void *my_malloc(size_t size) {
     return my_malloc(size);
   }
 
+  // |ptr| is the beginning of the allocated object.
+  //
+  // ... | metadata | object | ...
+  //     ^          ^
+  //     metadata   ptr
   void *ptr = best_fit_metadata + 1;
   size_t remaining_size = best_fit_metadata->size - size;
   my_remove_from_free_list(best_fit_metadata, best_fit_prev);
 
   if (remaining_size > sizeof(my_metadata_t)) {
-    // 残りの空きスロット用に新しいメタデータを作成
+    // Shrink the metadata for the allocated object
+    // to separate the rest of the region corresponding to remaining_size.
+    // If the remaining_size is not large enough to make a new metadata,
+    // this code path will not be taken and the region will be managed
+    // as a part of the allocated object.
+    // Create a new metadata for the remaining free slot.
+    //
+    // ... | metadata | object | metadata | free slot | ...
+    //     ^          ^        ^
+    //     metadata   ptr      new_metadata
+    //                 <------><---------------------->
+    //                   size       remaining size
     my_metadata_t *new_metadata = (my_metadata_t *)((char *)ptr + size);
     new_metadata->size = remaining_size - sizeof(my_metadata_t);
     new_metadata->next = NULL;
@@ -111,7 +139,14 @@ void *my_malloc(size_t size) {
   return ptr;
 }
 
+// This is called every time an object is freed.  You are not allowed to
+// use any library functions other than mmap_from_system / munmap_to_system.
 void my_free(void *ptr) {
+  // Look up the metadata. The metadata is placed just prior to the object.
+  //
+  // ... | metadata | object | ...
+  //     ^          ^
+  //     metadata   ptr
   my_metadata_t *metadata = (my_metadata_t *)ptr - 1;
 
   // 空きスロットを空きリストに追加
