@@ -86,6 +86,8 @@ void *my_malloc(size_t size) {
     if (metadata->size >= size && (!best_fit_metadata || metadata->size < best_fit_metadata->size)) {
       best_fit_metadata = metadata;
       best_fit_prev = prev;
+      if (metadata->size == size)
+        break; // Found an exact match
     }
     prev = metadata;
     metadata = metadata->next;
@@ -169,20 +171,8 @@ void my_free(void *ptr) {
 
 
 void my_finalize() {
-  // すべてのメモリ領域をシステムに返却
-  my_metadata_t *curr_metadata = my_heap.free_head;
-  while (curr_metadata) {
-    my_metadata_t *next_metadata = curr_metadata->next;
-    void *ptr = (void *)curr_metadata;
-
-    // 適切なアライメントを確保するためにポインタを調整
-    uintptr_t alignment = 4096;
-    uintptr_t aligned_ptr = ((uintptr_t)ptr / alignment) * alignment;
-    ptr = (void *)aligned_ptr;
-
-    size_t size = (curr_metadata->size + sizeof(my_metadata_t) + 4095) / 4096 * 4096;
-    curr_metadata = next_metadata;
-  }
+  // Nothing is here for now.
+  // feel free to add something if you want!
 }
 
 void test() {
